@@ -1,0 +1,20 @@
+{
+  "name": "gems-vault",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node scripts/test.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bignumber.js": "^6.0.0",
+    "dotenv": "^5.0.0",
+    "gems-token": "git+https://897be122973a528c4667e00f538413cf18dc7762:x-oauth-basic@github.com/gemsorg/gems-token.git",
+    "truffle-contract": "^3.0.2",
+    "truffle-wallet-provider": "0.0.5",
+    "web3": "^0.19.0",
+    "zeppelin-solidity": "^1.6.0"
+  }
+}
