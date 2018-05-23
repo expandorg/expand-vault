@@ -20,7 +20,7 @@ class GemsVault {
     this.from = from;
   }
 
-  async init() {
+  init() {
     const vaultContract = contract(vaultArtifacts);
     vaultContract.setProvider(this.provider);
     vaultContract.defaults({
@@ -28,7 +28,17 @@ class GemsVault {
       from: this.from,
       gasPrice: process.env.GAS_PRICE,
     });
-    this.vault = await vaultContract.at(process.env.VAULT_ADDRESS);
+
+    return new Promise((rslv, rjct) => {
+        vaultContract.at(process.env.GEMS_ADDRESS)
+          .then((vault) => {
+            this.vault = vault;
+            rslv();
+          })
+          .catch((err) => {
+            rjct(err);
+          });
+      });
   }
 
   async deposit(from, value) {
