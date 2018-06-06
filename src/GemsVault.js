@@ -5,6 +5,9 @@ const vaultArtifacts = require('../build/contracts/GemsVault.json');
 
 const eventAbis = vaultArtifacts.abi.filter((abi) => abi.type && abi.type === 'event');
 
+const statusError = new Error('Transaction rejected');
+statusError.name == 'StatusError';
+
 function validateAddress(address, name) {
   if (address.length !== 42 || address.slice(0, 2) !== '0x') {
     throw new Error(`Invalid '${name}' address`);
@@ -59,7 +62,11 @@ class GemsVault {
     validateAddress(from, 'from');
     validateValue(value);
 
-    const { tx } = await this.vault.deposit(from, value);
+    const { tx, receipt } = await this.vault.deposit(from, value);
+    if (receipt.status === '0x00') {
+      throw statusError;
+    }
+
     const log = await this.watcher.scry(tx, 'Deposited');
 
     if (log.args.from.toLowerCase() !== from.toLowerCase()) {
@@ -75,7 +82,11 @@ class GemsVault {
     validateAddress(to, 'to');
     validateValue(value);
 
-    const { tx } = await this.vault.withdraw(to, value);
+    const { tx, receipt } = await this.vault.withdraw(to, value);
+    if (receipt.status === '0x00') {
+      throw statusError;
+    }
+
     const log = await this.watcher.scry(tx, 'Withdrew');
 
     if (log.args.to.toLowerCase() !== to.toLowerCase()) {
