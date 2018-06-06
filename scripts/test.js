@@ -10,8 +10,7 @@ async function assertRevert(fn) {
   } catch (e) {
     err = e;
   }
-
-  assert(err.toString() === 'Error: VM Exception while processing transaction: revert');
+  assert(err.name === 'StatusError');
 }
 
 async function assertNoError(fn) {
@@ -21,7 +20,6 @@ async function assertNoError(fn) {
   } catch (e) {
     err = e;
   }
-
   assert(err === undefined);
 }
 
@@ -63,12 +61,12 @@ runScript(async (vault, ownerAddress, web3) => {
   await userToken.approve(process.env.VAULT_ADDRESS, depositValue);
   await assertNoError(() => vault.deposit(userAddress, depositValue));
   const depositBalance = await gemsOwnerToken.balanceOf(userAddress);
-  assert(depositBalance.equals(0));
+  assert(depositBalance.eq(0));
 
   // first withdraw should work
   await assertNoError(() => vault.withdraw(userAddress, maxWithdrawal));
   const firstWithdrawBalance = await gemsOwnerToken.balanceOf(userAddress);
-  assert(firstWithdrawBalance.equals(maxWithdrawal));
+  assert(firstWithdrawBalance.eq(maxWithdrawal));
 
   // second withdraw is over rate limit and should fail
   await assertRevert(() => vault.withdraw(userAddress, maxWithdrawal));
@@ -77,7 +75,10 @@ runScript(async (vault, ownerAddress, web3) => {
   await forwardDay();
   await assertNoError(() => vault.withdraw(userAddress, maxWithdrawal));
   const secondWithdrawBalance = await gemsOwnerToken.balanceOf(userAddress);
-  assert(secondWithdrawBalance.equals(depositValue));
+  assert(secondWithdrawBalance.eq(depositValue));
+
+  gemsOwnerToken.close();
+  userToken.close();
 })
   .then(() => console.log('done'))
   .catch(err => console.error(err));

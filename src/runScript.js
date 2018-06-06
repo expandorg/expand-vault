@@ -9,6 +9,7 @@ async function runScript(script) {
   const vault = new GemsVault(web3.currentProvider, ownerAddress);
   await vault.init();
   await script(vault, ownerAddress, web3);
+  vault.close();
 }
 
 module.exports = runScript;

@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@xlnt/scry-one": "0.0.1",
     "bignumber.js": "^6.0.0",
     "dotenv": "^5.0.0",
     "gems-token": "git+https://897be122973a528c4667e00f538413cf18dc7762:x-oauth-basic@github.com/gemsorg/gems-token.git",

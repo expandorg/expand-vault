@@ -1,5 +1,9 @@
 const contract = require('truffle-contract');
+const Big = require('bignumber.js');
+const Watcher = require('@xlnt/scry-one').default;
 const vaultArtifacts = require('../build/contracts/GemsVault.json');
+
+const eventAbis = vaultArtifacts.abi.filter((abi) => abi.type && abi.type === 'event');
 
 function validateAddress(address, name) {
   if (address.length !== 42 || address.slice(0, 2) !== '0x') {
@@ -18,6 +22,12 @@ class GemsVault {
     validateAddress(from, 'from');
     this.provider = provider;
     this.from = from;
+    this.watcher = new Watcher(
+      process.env.WEB3_PROVIDER,
+      eventAbis,
+      1,
+      500,
+    );
   }
 
   init() {
@@ -30,7 +40,7 @@ class GemsVault {
     });
 
     return new Promise((rslv, rjct) => {
-        vaultContract.at(process.env.GEMS_ADDRESS)
+        vaultContract.at(process.env.VAULT_ADDRESS)
           .then((vault) => {
             this.vault = vault;
             rslv();
@@ -41,50 +51,40 @@ class GemsVault {
       });
   }
 
+  close() {
+    this.watcher.stop();
+  }
+
   async deposit(from, value) {
     validateAddress(from, 'from');
     validateValue(value);
 
-    const { logs } = await this.vault.deposit(from, value);
+    const { tx } = await this.vault.deposit(from, value);
+    const log = await this.watcher.scry(tx, 'Deposited');
 
-    if (logs.length !== 1) {
-      throw new Error(`Unexpected event logs: ${logs.toString()}`);
-    }
-    const log = logs[0];
-    if (log.event !== 'Deposited') {
-      throw new Error(`Unexpected event log: ${log.toString()}`);
-    }
-    if (log.args.from !== from) {
+    if (log.args.from.toLowerCase() !== from.toLowerCase()) {
       throw new Error(`Unexpected 'from' address: ${log.args.from}`);
     }
-    if (!log.args.value.equals(value)) {
+    if (!new Big(log.args.value).eq(value)) {
       throw new Error(`Unexpected value: ${log.args.value}`);
     }
-
-    return logs;
+    return [log];
   }
 
   async withdraw(to, value) {
     validateAddress(to, 'to');
     validateValue(value);
 
-    const { logs } = await this.vault.withdraw(to, value);
+    const { tx } = await this.vault.withdraw(to, value);
+    const log = await this.watcher.scry(tx, 'Withdrew');
 
-    if (logs.length !== 1) {
-      throw new Error(`Unexpected event logs: ${logs.toString()}`);
-    }
-    const log = logs[0];
-    if (log.event !== 'Withdrew') {
-      throw new Error(`Unexpected event log: ${log.toString()}`);
-    }
-    if (log.args.to !== to) {
+    if (log.args.to.toLowerCase() !== to.toLowerCase()) {
       throw new Error(`Unexpected 'to' address: ${log.args.to}`);
     }
-    if (!log.args.value.equals(value)) {
+    if (!new Big(log.args.value).eq(value)) {
       throw new Error(`Unexpected value: ${log.args.value}`);
     }
-
-    return logs;
+    return [log];
   }
 }
 
