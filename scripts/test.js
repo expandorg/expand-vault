@@ -1,6 +1,6 @@
 const assert = require('assert');
 const Big = require('bignumber.js');
-const GemsToken = require('gems-token');
+const { GemsToken } = require('gems-token');
 const runScript = require('../src/runScript');
 
 async function assertRevert(fn) {
@@ -23,7 +23,7 @@ async function assertNoError(fn) {
   assert(err === undefined);
 }
 
-runScript(async (vault, ownerAddress, web3) => {
+runScript(async (vault, ownerAddress, web3, watcher) => {
   function forwardDay() {
     return new Promise((resolve, reject) => web3.currentProvider.sendAsync({
       jsonrpc: '2.0',
@@ -49,10 +49,10 @@ runScript(async (vault, ownerAddress, web3) => {
   const maxWithdrawal = 10000e+18;
   const depositValue = maxWithdrawal * 2;
 
-  const gemsOwnerToken = new GemsToken(web3.currentProvider, process.env.GEMS_OWNER_ADDRESS);
+  const gemsOwnerToken = new GemsToken(web3.currentProvider, process.env.GEMS_OWNER_ADDRESS, watcher);
   await gemsOwnerToken.init();
 
-  const userToken = new GemsToken(web3.currentProvider, userAddress);
+  const userToken = new GemsToken(web3.currentProvider, userAddress, watcher);
   await userToken.init();
 
   await gemsOwnerToken.transfer(userAddress, depositValue);
@@ -76,9 +76,6 @@ runScript(async (vault, ownerAddress, web3) => {
   await assertNoError(() => vault.withdraw(userAddress, maxWithdrawal));
   const secondWithdrawBalance = await gemsOwnerToken.balanceOf(userAddress);
   assert(secondWithdrawBalance.eq(depositValue));
-
-  gemsOwnerToken.close();
-  userToken.close();
 })
   .then(() => console.log('done'))
   .catch(err => console.error(err));
