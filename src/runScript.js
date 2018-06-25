@@ -14,7 +14,7 @@ const watcher = new Watcher(
 );
 
 async function runScript(script) {
-  const vault = new GemsVault(web3.currentProvider, ownerAddress, watcher);
+  const vault = new GemsVault(web3.currentProvider, ownerAddress);
   await vault.init();
   await script(vault, ownerAddress, web3, watcher);
   watcher.stop();
