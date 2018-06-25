@@ -53,7 +53,16 @@ class GemsVault {
     if (receipt.status === '0x00') {
       throw statusError;
     }
-    return tx;
+    return {
+      tx,
+      expected{
+        name: 'Deposited',
+        args: {
+          from: from.toLowerCase(),
+          value,
+        },
+      },
+    };
   }
 
   async withdraw(to, value, options) {
@@ -64,7 +73,16 @@ class GemsVault {
     if (receipt.status === '0x00') {
       throw statusError;
     }
-    return tx;
+    return {
+      tx,
+      expected{
+        name: 'Withdrew',
+        args: {
+          to: to.toLowerCase(),
+          value,
+        },
+      },
+    };
   }
 
   async reclaimToken(address, options) {
