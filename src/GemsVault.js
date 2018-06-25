@@ -55,7 +55,7 @@ class GemsVault {
     }
     return {
       tx,
-      expected{
+      expected: {
         name: 'Deposited',
         args: {
           from: from.toLowerCase(),
