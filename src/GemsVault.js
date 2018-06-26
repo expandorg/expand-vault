@@ -75,7 +75,7 @@ class GemsVault {
     }
     return {
       tx,
-      expected{
+      expected: {
         name: 'Withdrew',
         args: {
           to: to.toLowerCase(),
