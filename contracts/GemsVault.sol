@@ -23,7 +23,7 @@ contract GemsVault is Ownable, Pausable, CanReclaimToken, HasNoContracts, HasNoE
     }
 
     uint constant internal MAX_WITHDRAW_PERIOD = 1 days;
-    uint constant internal MAX_WITHDRAW_AMOUNT = 10000*10**18;
+    uint constant internal MAX_WITHDRAW_AMOUNT = 100000*10**18;
 
     StandardToken internal gems;
     mapping (address => Address) internal log;

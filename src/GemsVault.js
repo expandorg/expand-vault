@@ -85,6 +85,26 @@ class GemsVault {
 
     return [log];
   }
+
+  async reclaimToken(address) {
+    validateAddress(address, 'token');
+
+    const { tx, receipt } = await this.token.reclaimToken(address);
+    if (receipt.status === '0x00') {
+      throw statusError;
+    }
+    return {
+      tx,
+      expected: {
+        name: 'Transfer',
+        args: {
+          from: process.env.GEMS_ADDRESS,
+          to: process.env.VAULT_OWNER_ADDRESS,
+        },
+      },
+    };
+  }
+
 }
 
 module.exports = {
