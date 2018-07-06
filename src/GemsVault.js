@@ -46,11 +46,11 @@ class GemsVault {
       });
   }
 
-  async deposit(from, value) {
+  async deposit(from, value, options) {
     validateAddress(from, 'from');
     validateValue(value);
 
-    const { tx, receipt } = await this.vault.deposit(from, value);
+    const { tx, receipt } = await this.vault.deposit(from, value, options);
     if (receipt.status === '0x00') {
       throw statusError;
     }
@@ -66,11 +66,11 @@ class GemsVault {
     return [log];
   }
 
-  async withdraw(to, value) {
+  async withdraw(to, value, options) {
     validateAddress(to, 'to');
     validateValue(value);
 
-    const { tx, receipt } = await this.vault.withdraw(to, value);
+    const { tx, receipt } = await this.vault.withdraw(to, value, options);
     if (receipt.status === '0x00') {
       throw statusError;
     }
@@ -86,10 +86,10 @@ class GemsVault {
     return [log];
   }
 
-  async reclaimToken(address) {
+  async reclaimToken(address, options) {
     validateAddress(address, 'token');
 
-    const { tx, receipt } = await this.token.reclaimToken(address);
+    const { tx, receipt } = await this.token.reclaimToken(address, options);
     if (receipt.status === '0x00') {
       throw statusError;
     }
