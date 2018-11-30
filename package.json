@@ -1,13 +1,17 @@
 {
-  "name": "gems-vault",
+  "name": "@gemsorg/gems-vault",
   "version": "1.0.0",
-  "description": "",
+  "description": "Convenience wrapper for the Gems vault Ethereum contract",
   "main": "index.js",
   "scripts": {
     "test": "node scripts/test.js"
   },
-  "author": "",
+  "author": "gems.org",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gemsorg/gems-vault.git"
+  },
   "dependencies": {
     "@xlnt/scry-one": "0.0.1",
     "bignumber.js": "^6.0.0",
