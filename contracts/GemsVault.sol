@@ -23,9 +23,10 @@ contract GemsVault is Ownable, Pausable, CanReclaimToken, HasNoContracts, HasNoE
     }
 
     uint constant internal MAX_WITHDRAW_PERIOD = 1 days;
-    uint constant internal MAX_WITHDRAW_AMOUNT = 100000*10**18;
+    uint constant internal MAX_WITHDRAW_AMOUNT = 1000000*10**18;
 
     StandardToken internal gems;
+    StandardToken internal xpn;
     mapping (address => Address) internal log;
 
     event Deposited(address from, uint value);
@@ -41,12 +42,14 @@ contract GemsVault is Ownable, Pausable, CanReclaimToken, HasNoContracts, HasNoE
         _;
     }
 
-    function GemsVault(address _gems)
+    function GemsVault(address _gems, address _xpn)
         public
         Ownable
         nonzeroAddress(_gems)
+        nonzeroAddress(_xpn)
     {
         gems = StandardToken(_gems);
+        xpn = StandardToken(_xpn);
     }
 
     function deposit(address _from, uint _value)
@@ -61,6 +64,19 @@ contract GemsVault is Ownable, Pausable, CanReclaimToken, HasNoContracts, HasNoE
         return true;
     }
 
+
+    function depositXpn(address _from, uint _value)
+        external
+        onlyOwner
+        nonzeroAddress(_from)
+        nonzeroValue(_value)
+        returns (bool)
+    {
+        xpn.transferFrom(_from, this, _value);
+        Deposited(_from, _value);
+        return true;
+    }
+
     function withdraw(address _to, uint _value)
         external
         onlyOwner
@@ -69,7 +85,7 @@ contract GemsVault is Ownable, Pausable, CanReclaimToken, HasNoContracts, HasNoE
         returns (bool)
     {
         logWithdrawal(_to, _value);
-        gems.transfer(_to, _value);
+        xpn.transfer(_to, _value);
         Withdrew(_to, _value);
         return true;
     }

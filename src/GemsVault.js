@@ -65,6 +65,26 @@ class GemsVault {
     };
   }
 
+  async depositXpn(from, value, options) {
+    validateAddress(from, 'from');
+    validateValue(value);
+
+    const { tx, receipt } = await this.vault.depositXpn(from, value, options);
+    if (receipt.status === '0x00') {
+      throw statusError;
+    }
+    return {
+      tx,
+      expected: {
+        name: 'Deposited',
+        args: {
+          from: from.toLowerCase(),
+          value,
+        },
+      },
+    };
+  }
+
   async withdraw(to, value, options) {
     validateAddress(to, 'to');
     validateValue(value);
