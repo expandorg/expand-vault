@@ -13,6 +13,7 @@
     "url": "git+https://github.com/gemsorg/gems-vault.git"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^2.4.0",
     "@xlnt/scry-one": "0.0.1",
     "bignumber.js": "^6.0.0",
     "dotenv": "^5.0.0",
