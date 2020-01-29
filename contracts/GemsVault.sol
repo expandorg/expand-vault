@@ -87,7 +87,7 @@ contract GemsVault is Ownable, Pausable {
         return true;
     }
 
-    function logWithdrawal(address _to, uint _value)
+   function logWithdrawal(address _to, uint _value)
         internal
     {
         uint sum;
