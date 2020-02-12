@@ -1,6 +1,6 @@
 const contract = require('truffle-contract');
 const Big = require('bignumber.js');
-const vaultArtifacts = require('../build/contracts/GemsVault.json');
+const vaultArtifacts = require('../build/contracts/ExpandVault.json');
 
 const statusError = new Error('Transaction rejected');
 statusError.name = 'StatusError';
@@ -17,7 +17,7 @@ function validateValue(value) {
   }
 }
 
-class GemsVault {
+class ExpandVault {
   constructor(provider, from) {
     validateAddress(from, 'from');
     this.provider = provider;
@@ -65,6 +65,26 @@ class GemsVault {
     };
   }
 
+  async depositXpn(from, value, options) {
+    validateAddress(from, 'from');
+    validateValue(value);
+
+    const { tx, receipt } = await this.vault.depositXpn(from, value, options);
+    if (receipt.status === '0x00') {
+      throw statusError;
+    }
+    return {
+      tx,
+      expected: {
+        name: 'Deposited',
+        args: {
+          from: from.toLowerCase(),
+          value,
+        },
+      },
+    };
+  }
+
   async withdraw(to, value, options) {
     validateAddress(to, 'to');
     validateValue(value);
@@ -97,7 +117,7 @@ class GemsVault {
       expected: {
         name: 'Transfer',
         args: {
-          from: process.env.GEMS_ADDRESS,
+          from: process.env.EXPAND_ADDRESS,
           to: process.env.VAULT_OWNER_ADDRESS,
         },
       },
@@ -107,6 +127,6 @@ class GemsVault {
 }
 
 module.exports = {
-  GemsVault,
+  ExpandVault,
   events: vaultArtifacts.abi.filter((abi) => abi.type && abi.type === 'event'),
 };

@@ -1,15 +1,12 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.5.0;
 
-import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
-import "zeppelin-solidity/contracts/math/SafeMath.sol";
-import "zeppelin-solidity/contracts/ownership/CanReclaimToken.sol";
-import "zeppelin-solidity/contracts/ownership/HasNoContracts.sol";
-import "zeppelin-solidity/contracts/ownership/HasNoEther.sol";
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
-import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
+import "@openzeppelin/contracts/lifecycle/Pausable.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 
-contract GemsVault is Ownable, Pausable, CanReclaimToken, HasNoContracts, HasNoEther {
+contract ExpandVault is Ownable, Pausable {
     using SafeMath for uint;
 
     struct Withdrawal {
@@ -23,9 +20,10 @@ contract GemsVault is Ownable, Pausable, CanReclaimToken, HasNoContracts, HasNoE
     }
 
     uint constant internal MAX_WITHDRAW_PERIOD = 1 days;
-    uint constant internal MAX_WITHDRAW_AMOUNT = 100000*10**18;
+    uint constant internal MAX_WITHDRAW_AMOUNT = 1000000*10**18;
 
-    StandardToken internal gems;
+    ERC20 internal xpn;
+
     mapping (address => Address) internal log;
 
     event Deposited(address from, uint value);
@@ -41,12 +39,12 @@ contract GemsVault is Ownable, Pausable, CanReclaimToken, HasNoContracts, HasNoE
         _;
     }
 
-    function GemsVault(address _gems)
+    constructor(address _expand, address _xpn)
         public
-        Ownable
-        nonzeroAddress(_gems)
+        nonzeroAddress(_expand)
+        nonzeroAddress(_xpn)
     {
-        gems = StandardToken(_gems);
+        xpn = ERC20(_xpn);
     }
 
     function deposit(address _from, uint _value)
@@ -56,10 +54,11 @@ contract GemsVault is Ownable, Pausable, CanReclaimToken, HasNoContracts, HasNoE
         nonzeroValue(_value)
         returns (bool)
     {
-        gems.transferFrom(_from, this, _value);
-        Deposited(_from, _value);
+        xpn.transferFrom(_from, address(this), _value);
+        emit Deposited(_from, _value);
         return true;
     }
+
 
     function withdraw(address _to, uint _value)
         external
@@ -69,12 +68,12 @@ contract GemsVault is Ownable, Pausable, CanReclaimToken, HasNoContracts, HasNoE
         returns (bool)
     {
         logWithdrawal(_to, _value);
-        gems.transfer(_to, _value);
-        Withdrew(_to, _value);
+        xpn.transfer(_to, _value);
+       	emit Withdrew(_to, _value);
         return true;
     }
 
-    function logWithdrawal(address _to, uint _value)
+   function logWithdrawal(address _to, uint _value)
         internal
     {
         uint sum;
