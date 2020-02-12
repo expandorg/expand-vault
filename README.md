@@ -1,6 +1,6 @@
-# Gems Vault
+# Expand Vault
 
-Contains the GemsVault contract and convenience wrappers for executing views and transactions.
+Contains the ExpandVault contract and convenience wrappers for executing views and transactions.
 
 ## Environments
 
