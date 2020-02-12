@@ -1,6 +1,6 @@
 const assert = require('assert');
 const Big = require('bignumber.js');
-const { GemsToken } = require('gems-token');
+const { ExpandToken } = require('expand-token');
 const runScript = require('../src/runScript');
 
 async function assertRevert(fn) {
@@ -49,23 +49,23 @@ runScript(async (vault, ownerAddress, web3, watcher) => {
   const maxWithdrawal = 10000e+18;
   const depositValue = maxWithdrawal * 2;
 
-  const gemsOwnerToken = new GemsToken(web3.currentProvider, process.env.GEMS_OWNER_ADDRESS, watcher);
-  await gemsOwnerToken.init();
+  const expandOwnerToken = new ExpandToken(web3.currentProvider, process.env.EXPAND_OWNER_ADDRESS, watcher);
+  await expandOwnerToken.init();
 
-  const userToken = new GemsToken(web3.currentProvider, userAddress, watcher);
+  const userToken = new ExpandToken(web3.currentProvider, userAddress, watcher);
   await userToken.init();
 
-  await gemsOwnerToken.transfer(userAddress, depositValue);
+  await expandOwnerToken.transfer(userAddress, depositValue);
 
   // deposit should work
   await userToken.approve(process.env.VAULT_ADDRESS, depositValue);
   await assertNoError(() => vault.deposit(userAddress, depositValue));
-  const depositBalance = await gemsOwnerToken.balanceOf(userAddress);
+  const depositBalance = await expandOwnerToken.balanceOf(userAddress);
   assert(depositBalance.eq(0));
 
   // first withdraw should work
   await assertNoError(() => vault.withdraw(userAddress, maxWithdrawal));
-  const firstWithdrawBalance = await gemsOwnerToken.balanceOf(userAddress);
+  const firstWithdrawBalance = await expandOwnerToken.balanceOf(userAddress);
   assert(firstWithdrawBalance.eq(maxWithdrawal));
 
   // second withdraw is over rate limit and should fail
@@ -74,7 +74,7 @@ runScript(async (vault, ownerAddress, web3, watcher) => {
   // second withdraw should work after 24 hours
   await forwardDay();
   await assertNoError(() => vault.withdraw(userAddress, maxWithdrawal));
-  const secondWithdrawBalance = await gemsOwnerToken.balanceOf(userAddress);
+  const secondWithdrawBalance = await expandOwnerToken.balanceOf(userAddress);
   assert(secondWithdrawBalance.eq(depositValue));
 })
   .then(() => console.log('done'))

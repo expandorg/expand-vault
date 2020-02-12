@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/ownership/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 
-contract GemsVault is Ownable, Pausable {
+contract ExpandVault is Ownable, Pausable {
     using SafeMath for uint;
 
     struct Withdrawal {
@@ -22,7 +22,6 @@ contract GemsVault is Ownable, Pausable {
     uint constant internal MAX_WITHDRAW_PERIOD = 1 days;
     uint constant internal MAX_WITHDRAW_AMOUNT = 1000000*10**18;
 
-    ERC20 internal gems;
     ERC20 internal xpn;
 
     mapping (address => Address) internal log;
@@ -40,12 +39,11 @@ contract GemsVault is Ownable, Pausable {
         _;
     }
 
-    constructor(address _gems, address _xpn)
+    constructor(address _expand, address _xpn)
         public
-        nonzeroAddress(_gems)
+        nonzeroAddress(_expand)
         nonzeroAddress(_xpn)
     {
-        gems = ERC20(_gems);
         xpn = ERC20(_xpn);
     }
 
@@ -56,23 +54,11 @@ contract GemsVault is Ownable, Pausable {
         nonzeroValue(_value)
         returns (bool)
     {
-        gems.transferFrom(_from, address(this), _value);
-        emit Deposited(_from, _value);
-        return true;
-    }
-
-
-    function depositXpn(address _from, uint _value)
-        external
-        onlyOwner
-        nonzeroAddress(_from)
-        nonzeroValue(_value)
-        returns (bool)
-    {
         xpn.transferFrom(_from, address(this), _value);
         emit Deposited(_from, _value);
         return true;
     }
+
 
     function withdraw(address _to, uint _value)
         external

@@ -1,1 +1,1 @@
-module.exports = require('./src/GemsVault');
+module.exports = require('./src/ExpandVault');
