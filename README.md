@@ -1,6 +1,6 @@
 # Expand Vault
 
-Contains the ExpandVault contract and convenience wrappers for executing views and transactions.
+The Expand Vault holds XPN tokens deposited by either workers or requesters, that are then withdrawable. This repo contains the ExpandVault contract and convenience wrappers for executing views and transactions.
 
 ## Environments
 
