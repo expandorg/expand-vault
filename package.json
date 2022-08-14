@@ -13,7 +13,7 @@
     "url": "git+https://github.com/expandorg/expand-vault.git"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^2.4.0",
+    "@openzeppelin/contracts": "^4.7.2",
     "@xlnt/scry-one": "0.0.1",
     "bignumber.js": "^6.0.0",
     "dotenv": "^5.0.0",
